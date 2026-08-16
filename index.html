@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="description" content="Agent 入门交互式科普站：智能体是什么、能做什么、核心词汇、发展历程，以及如何帮助重离子碰撞研究与普通人成长。">
+<title>Agent 进化指南 · 交互式科普</title>
+<!-- ===== CSS:STYLE ===== -->
+<style>
+/* ================= 基础 ================= */
+:root{
+  --bg:#060a13;
+  --bg-2:#0a1120;
+  --surface:#0e1730;
+  --surface-2:#121d3a;
+  --line:rgba(120,160,255,.14);
+  --text:#e8eefb;
+  --muted:#93a3c4;
+  --cyan:#22d3ee;
+  --violet:#a78bfa;
+  --pink:#f472b6;
+  --amber:#fbbf24;
+  --grad:linear-gradient(120deg,var(--cyan),var(--violet) 55%,var(--pink));
+  --radius:16px;
+  --shadow:0 20px 60px rgba(2,6,18,.55);
+  --font:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Segoe UI",system-ui,-apple-system,sans-serif;
+  --mono:"Cascadia Code",Consolas,"SF Mono",Menlo,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  font-family:var(--font);
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.75;
+  overflow-x:hidden;
+  min-height:100vh;
+}
+img,svg,canvas{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer}
+::selection{background:rgba(167,139,250,.35)}
+:focus-visible{outline:2px solid var(--cyan);outline-offset:3px;border-radius:6px}
+.skip-link{position:absolute;left:-999px;top:0;z-index:100;background:var(--cyan);color:#04101a;padding:10px 16px;border-radius:0 0 10px 0;font-weight:700}
+.skip-link:focus{left:0}
+
+.container{width:min(1160px,92%);margin-inline:auto}
+.grad-text{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.pc-only{display:inline}
+
+/* 滚动进度条 */
+.scroll-progress{position:fixed;top:0;left:0;height:3px;width:0;background:var(--grad);z-index:60;border-radius:0 3px 3px 0}
+
+/* ================= 导航 ================= */
+.nav{position:fixed;top:0;left:0;right:0;z-index:50;transition:background .35s,border-color .35s,backdrop-filter .35s;border-bottom:1px solid transparent}
+.nav.scrolled{background:rgba(6,10,19,.82);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom-color:var(--line)}
+.nav-inner{width:min(1240px,94%);margin-inline:auto;height:62px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{display:flex;align-items:center;gap:9px;font-weight:800;font-size:1.06rem;letter-spacing:.02em;white-space:nowrap}
+.brand-logo{color:var(--cyan);display:grid;place-items:center;filter:drop-shadow(0 0 8px rgba(34,211,238,.55));animation:logoSpin 14s linear infinite}
+@keyframes logoSpin{to{transform:rotate(360deg)}}
+.brand-accent{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.nav-links{display:flex;gap:4px;align-items:center}
+.nav-links a{position:relative;padding:8px 12px;font-size:.9rem;color:var(--muted);border-radius:10px;transition:color .25s,background .25s;white-space:nowrap}
+.nav-links a:hover{color:var(--text);background:rgba(255,255,255,.05)}
+.nav-links a.active{color:var(--cyan)}
+.nav-links a.active::after{content:"";position:absolute;left:12px;right:12px;bottom:2px;height:2px;border-radius:2px;background:var(--grad)}
+.nav-toggle{display:none;background:none;border:0;width:42px;height:42px;border-radius:10px;position:relative;z-index:60}
+.nav-toggle span{display:block;width:22px;height:2px;background:var(--text);margin:5px auto;border-radius:2px;transition:transform .3s,opacity .3s}
+.nav-toggle.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.nav-toggle.open span:nth-child(2){opacity:0}
+.nav-toggle.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+
+/* ================= Hero ================= */
+.hero{position:relative;min-height:100vh;min-height:100svh;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:120px 20px 90px}
+.hero-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+.hero-glow{position:absolute;inset:-30%;z-index:0;background:radial-gradient(42% 42% at 26% 28%,rgba(34,211,238,.16),transparent 70%),radial-gradient(40% 40% at 74% 66%,rgba(167,139,250,.18),transparent 70%),radial-gradient(30% 30% at 62% 20%,rgba(244,114,182,.12),transparent 70%);filter:blur(10px);animation:glowFloat 12s ease-in-out infinite alternate}
+@keyframes glowFloat{from{transform:translate3d(0,0,0) scale(1)}to{transform:translate3d(0,-24px,0) scale(1.06)}}
+.hero-content{position:relative;z-index:2;text-align:center;max-width:900px}
+.hero-kicker{display:inline-block;font-size:.82rem;letter-spacing:.32em;color:var(--cyan);border:1px solid rgba(34,211,238,.4);border-radius:999px;padding:7px 18px 7px 22px;background:rgba(34,211,238,.08);text-transform:uppercase;margin-bottom:26px}
+.hero-title{font-size:clamp(2.5rem,7vw,4.6rem);font-weight:900;line-height:1.14;letter-spacing:.01em;margin-bottom:20px}
+.hero-title .grad-text{filter:drop-shadow(0 0 26px rgba(167,139,250,.45))}
+.hero-sub{font-size:clamp(.98rem,2vw,1.18rem);color:var(--muted);margin-bottom:36px}
+.hero-actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:56px}
+.btn{display:inline-flex;align-items:center;gap:8px;border-radius:14px;padding:13px 26px;font-size:.98rem;font-weight:700;border:1px solid transparent;transition:transform .25s,box-shadow .25s,background .25s,color .25s;text-align:center}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--grad);color:#061020;box-shadow:0 8px 28px rgba(139,92,246,.35)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 14px 38px rgba(139,92,246,.5)}
+.btn-ghost{background:rgba(255,255,255,.05);border-color:var(--line);color:var(--text)}
+.btn-ghost:hover{transform:translateY(-2px);background:rgba(255,255,255,.1);border-color:rgba(120,160,255,.35)}
+.btn-small{padding:9px 18px;font-size:.88rem;border-radius:11px}
+.hero-stats{display:flex;justify-content:center;gap:clamp(18px,4vw,54px);flex-wrap:wrap}
+.stat{display:flex;flex-direction:column;align-items:center;gap:2px}
+.stat-num{font-size:clamp(1.5rem,3.6vw,2.3rem);font-weight:900;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;font-variant-numeric:tabular-nums}
+.stat span{font-size:.82rem;color:var(--muted)}
+.hero-scroll{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);z-index:2;display:grid;place-items:center}
+.mouse{width:24px;height:38px;border:2px solid rgba(147,163,196,.6);border-radius:14px;display:block;position:relative}
+.wheel{position:absolute;left:50%;top:7px;width:4px;height:8px;margin-left:-2px;border-radius:4px;background:var(--cyan);animation:wheel 1.8s ease-in-out infinite}
+@keyframes wheel{0%{transform:translateY(0);opacity:1}70%{transform:translateY(12px);opacity:0}100%{opacity:0}}
+
+/* ================= 通用板块 ================= */
+.section{padding:clamp(70px,9vw,110px) 0;position:relative}
+.section-alt{background:linear-gradient(180deg,var(--bg) 0%,var(--bg-2) 14%,var(--bg-2) 86%,var(--bg) 100%)}
+.sec-head{text-align:center;margin-bottom:clamp(40px,6vw,64px)}
+.sec-num{display:inline-block;font-family:var(--mono);font-size:.85rem;letter-spacing:.3em;color:var(--violet);margin-bottom:12px}
+.sec-head h2{font-size:clamp(1.7rem,4.4vw,2.6rem);font-weight:900;letter-spacing:.01em;margin-bottom:14px}
+.sec-desc{color:var(--muted);max-width:760px;margin-inline:auto;font-size:clamp(.94rem,1.6vw,1.05rem)}
+.sec-desc strong{color:var(--text)}
+
+/* ================= 什么是 Agent ================= */
+.what-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(30px,5vw,64px);align-items:start}
+.what-text h3{font-size:clamp(1.15rem,2.4vw,1.4rem);margin-bottom:14px}
+.what-text>p{color:var(--muted);margin-bottom:14px}
+.what-text>p strong{color:var(--text)}
+.check-list{list-style:none;display:flex;flex-direction:column;gap:10px;margin:18px 0}
+.check-list li{position:relative;padding-left:30px;color:var(--text);font-size:.95rem}
+.check-list li::before{content:"✓";position:absolute;left:0;top:1px;width:20px;height:20px;border-radius:7px;background:rgba(34,211,238,.14);border:1px solid rgba(34,211,238,.4);color:var(--cyan);font-size:.78rem;display:grid;place-items:center}
+.check-list b{color:var(--cyan);font-weight:700}
+.what-tip{background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.3);color:#f6d9a0;border-radius:12px;padding:12px 16px;font-size:.9rem}
+
+/* ---- Agent 循环演示 ---- */
+.loop-demo{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:clamp(20px,3vw,32px);box-shadow:var(--shadow);position:sticky;top:90px}
+.loop-stage{position:relative;width:min(340px,100%);aspect-ratio:1;margin:0 auto 18px;--ring-r:min(31vw,128px)}
+.loop-core{position:absolute;left:50%;top:50%;width:88px;height:88px;margin:-44px 0 0 -44px;border-radius:50%;display:grid;place-items:center;text-align:center;font-weight:800;font-size:1rem;z-index:3;color:#061020;background:var(--grad);box-shadow:0 0 34px rgba(139,92,246,.55);animation:corePulse 3s ease-in-out infinite}
+.loop-core small{font-size:.68rem;font-weight:600;opacity:.75}
+@keyframes corePulse{0%,100%{box-shadow:0 0 26px rgba(139,92,246,.45)}50%{box-shadow:0 0 46px rgba(34,211,238,.6)}}
+.loop-ring{position:absolute;left:50%;top:50%;width:calc(var(--ring-r) + var(--ring-r));height:calc(var(--ring-r) + var(--ring-r));margin-left:calc(0px - var(--ring-r));margin-top:calc(0px - var(--ring-r));border-radius:50%;pointer-events:none}
+.ring-1{border:1.6px dashed rgba(120,160,255,.35)}
+.ring-2{border:1px solid rgba(34,211,238,.22);animation:ringSpin 18s linear infinite}
+@keyframes ringSpin{to{transform:rotate(360deg)}}
+.loop-node{position:absolute;left:50%;top:50%;width:62px;height:62px;margin:-31px 0 0 -31px;border-radius:50%;background:var(--surface-2);border:1.6px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;z-index:2;transform:rotate(var(--angle)) translateY(calc(0px - var(--ring-r)));transition:border-color .35s,box-shadow .35s,background .35s;cursor:pointer}
+.loop-node .node-icon{font-size:1.15rem;transform:rotate(calc(0deg - var(--angle)));line-height:1;transition:transform .35s}
+.loop-node .node-name{font-size:.62rem;color:var(--muted);transform:rotate(calc(0deg - var(--angle)));white-space:nowrap;transition:transform .35s}
+.loop-node:hover{border-color:rgba(34,211,238,.6)}
+.loop-node.active{background:rgba(34,211,238,.14);border-color:var(--cyan);box-shadow:0 0 22px rgba(34,211,238,.5)}
+.loop-node.done{border-color:rgba(167,139,250,.7);background:rgba(167,139,250,.1)}
+.loop-node.active .node-name{color:var(--cyan)}
+.loop-step-label{min-height:3.2em;text-align:center;color:var(--muted);font-size:.9rem;padding:0 6px}
+.loop-step-label b{color:var(--text)}
+.loop-dots{display:flex;justify-content:center;gap:8px;margin:12px 0}
+.dot{width:9px;height:9px;border-radius:50%;background:rgba(147,163,196,.25);transition:background .3s,transform .3s}
+.dot.on{background:var(--cyan);transform:scale(1.25);box-shadow:0 0 10px rgba(34,211,238,.8)}
+.loop-btns{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
+
+/* ================= 能力卡片 ================= */
+.cap-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px}
+.cap-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:26px 22px 20px;position:relative;overflow:hidden;transition:transform .3s,border-color .3s,box-shadow .3s;display:flex;flex-direction:column;gap:10px}
+.cap-card::before{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:var(--grad);opacity:0;transition:opacity .3s}
+.cap-card:hover{transform:translateY(-6px);border-color:rgba(120,160,255,.38);box-shadow:var(--shadow)}
+.cap-card:hover::before{opacity:1}
+.cap-icon{font-size:2rem;line-height:1;width:56px;height:56px;display:grid;place-items:center;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid var(--line);margin-bottom:4px}
+.cap-card h3{font-size:1.06rem}
+.cap-card>p{color:var(--muted);font-size:.9rem;flex:1}
+.cap-more{background:none;border:0;color:var(--cyan);font-size:.86rem;font-weight:600;text-align:left;padding:2px 0;display:inline-flex;align-items:center;gap:5px;align-self:flex-start}
+.cap-more span{transition:transform .3s;display:inline-block}
+.cap-more[aria-expanded="true"] span{transform:rotate(180deg)}
+.cap-detail{max-height:0;overflow:hidden;transition:max-height .45s ease;font-size:.87rem}
+.cap-detail p{color:#c6d2ea;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.cap-card.expanded{border-color:rgba(34,211,238,.45)}
+.cap-card.expanded .cap-detail{max-height:240px}
+
+/* ================= 词汇卡 ================= */
+.term-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:18px}
+.term-card{perspective:1200px;height:178px;cursor:pointer}
+.term-inner{position:relative;width:100%;height:100%;transition:transform .65s cubic-bezier(.4,.1,.2,1);transform-style:preserve-3d}
+.term-card.flipped .term-inner{transform:rotateY(180deg)}
+.term-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:var(--radius);border:1px solid var(--line);padding:18px;display:flex;flex-direction:column;justify-content:center;background:var(--surface);transition:border-color .3s,box-shadow .3s}
+.term-card:hover .term-face{box-shadow:var(--shadow)}
+.term-front{align-items:center;text-align:center;gap:6px}
+.term-front .t-icon{font-size:1.9rem}
+.term-front .t-en{font-family:var(--mono);font-size:.72rem;color:var(--violet);letter-spacing:.06em}
+.term-front h3{font-size:1.06rem;font-weight:800}
+.term-front .t-hint{font-size:.72rem;color:var(--muted)}
+.term-back{transform:rotateY(180deg);background:linear-gradient(160deg,var(--surface-2),var(--surface));border-color:rgba(34,211,238,.4);text-align:left;justify-content:flex-start;overflow-y:auto;scrollbar-width:thin}
+.term-back h4{color:var(--cyan);font-size:.92rem;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.term-back p{font-size:.84rem;color:#c6d2ea}
+.terms-hint{text-align:center;color:var(--muted);font-size:.85rem;margin-top:26px}
+
+/* ================= 时间轴 ================= */
+.timeline{position:relative;max-width:960px;margin-inline:auto;padding:10px 0}
+.timeline::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:2px;transform:translateX(-50%);background:linear-gradient(180deg,transparent,var(--violet) 8%,var(--cyan) 50%,var(--violet) 92%,transparent);opacity:.5}
+.tl-item{position:relative;width:50%;padding:0 44px 44px 0}
+.tl-item:nth-child(even){margin-left:50%;padding:0 0 44px 44px}
+.tl-dot{position:absolute;top:4px;right:-9px;width:18px;height:18px;border-radius:50%;background:var(--bg);border:3px solid var(--cyan);box-shadow:0 0 0 4px rgba(34,211,238,.15);transition:box-shadow .3s,transform .3s;z-index:2}
+.tl-item:nth-child(even) .tl-dot{right:auto;left:-9px}
+.tl-item:hover .tl-dot{transform:scale(1.25);box-shadow:0 0 0 7px rgba(34,211,238,.2)}
+.tl-item.future .tl-dot{border-color:var(--pink);box-shadow:0 0 0 4px rgba(244,114,182,.15)}
+.tl-item.future:hover .tl-dot{box-shadow:0 0 0 7px rgba(244,114,182,.22)}
+.tl-card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 20px;cursor:pointer;transition:transform .3s,border-color .3s,box-shadow .3s}
+.tl-card:hover{transform:translateY(-3px);border-color:rgba(120,160,255,.4);box-shadow:var(--shadow)}
+.tl-date{font-family:var(--mono);font-size:.75rem;color:var(--violet);letter-spacing:.08em;margin-bottom:2px}
+.tl-item.future .tl-date{color:var(--pink)}
+.tl-title{font-size:1rem;font-weight:800;margin-bottom:2px}
+.tl-badge{display:inline-block;font-size:.66rem;padding:2px 9px;border-radius:999px;background:rgba(34,211,238,.12);color:var(--cyan);border:1px solid rgba(34,211,238,.35);margin-left:8px;vertical-align:2px}
+.tl-badge.future{background:rgba(244,114,182,.12);color:var(--pink);border-color:rgba(244,114,182,.4)}
+.tl-desc{max-height:0;overflow:hidden;transition:max-height .45s ease;font-size:.86rem;color:var(--muted)}
+.tl-desc p{padding-top:8px;border-top:1px dashed var(--line);margin-top:8px}
+.tl-item.open .tl-desc{max-height:200px}
+
+/* ================= 重离子碰撞 ================= */
+.hi-demo{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:clamp(14px,2.5vw,26px);margin-bottom:46px;box-shadow:var(--shadow)}
+.hi-demo canvas{width:100%;height:auto;border-radius:12px;background:radial-gradient(120% 120% at 50% 0%,#0d1830 0%,#070d1a 70%);border:1px solid var(--line)}
+.hi-controls{display:flex;align-items:center;gap:16px;margin-top:14px;flex-wrap:wrap}
+.hi-tip{color:var(--muted);font-size:.88rem}
+.hi-caption{color:var(--muted);font-size:.82rem;margin-top:10px;text-align:center}
+.story-card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;margin:14px 0}
+.story-q{font-weight:700;margin-bottom:10px}
+.story-steps{list-style:none;display:flex;flex-direction:column;gap:8px;margin-bottom:12px;counter-reset:s}
+.story-steps li{font-size:.9rem;color:var(--muted);padding-left:26px;position:relative}
+.story-steps li b{color:var(--text)}
+.story-steps li::before{content:counter(s);counter-increment:s;position:absolute;left:0;top:2px;width:18px;height:18px;border-radius:6px;background:rgba(34,211,238,.14);border:1px solid rgba(34,211,238,.4);color:var(--cyan);font-size:.7rem;display:grid;place-items:center;font-weight:700}
+.story-a{background:rgba(34,211,238,.08);border:1px solid rgba(34,211,238,.3);color:#b8eef7;border-radius:12px;padding:12px 14px;font-size:.88rem}
+
+/* ================= 普通人进阶 ================= */
+.steps{display:flex;flex-direction:column;gap:18px;max-width:820px;margin-inline:auto;margin-bottom:54px}
+.step{display:flex;gap:20px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:22px 24px;transition:transform .3s,border-color .3s,box-shadow .3s;position:relative}
+.step:hover{transform:translateX(8px);border-color:rgba(120,160,255,.4);box-shadow:var(--shadow)}
+.step-num{flex:0 0 auto;width:48px;height:48px;border-radius:14px;background:var(--grad);color:#061020;font-weight:900;font-size:1.25rem;display:grid;place-items:center;box-shadow:0 6px 20px rgba(139,92,246,.35)}
+.step-body h3{font-size:1.08rem;margin-bottom:6px}
+.step-body p{color:var(--muted);font-size:.92rem}
+.prompt-demo{margin-top:12px;background:rgba(255,255,255,.04);border:1px dashed rgba(120,160,255,.3);border-radius:12px;padding:12px 14px;font-size:.87rem;color:#c6d2ea}
+.prompt-demo i{font-style:normal}
+.growth-cta{max-width:820px;margin-inline:auto;text-align:center;background:linear-gradient(160deg,rgba(34,211,238,.09),rgba(167,139,250,.09));border:1px solid rgba(120,160,255,.3);border-radius:22px;padding:clamp(24px,4vw,40px)}
+.growth-cta h3{font-size:1.3rem;margin-bottom:8px}
+.growth-cta>p{color:var(--muted);font-size:.92rem;margin-bottom:18px}
+.copy-box{display:flex;gap:12px;align-items:center;background:var(--bg-2);border:1px solid var(--line);border-radius:14px;padding:14px 16px;text-align:left;flex-wrap:wrap}
+.copy-box code{flex:1;min-width:200px;font-family:var(--mono);font-size:.82rem;color:#c6d2ea;line-height:1.7;white-space:normal;word-break:break-word}
+#copyBtn.copied{background:rgba(52,211,153,.9);color:#041a10}
+
+/* ================= 页脚 / 返回顶部 ================= */
+.footer{border-top:1px solid var(--line);padding:44px 0 52px;text-align:center;background:var(--bg-2)}
+.footer-title{font-weight:800;margin-bottom:8px}
+.footer p{color:var(--muted);font-size:.85rem;margin-bottom:8px}
+.footer-links a{color:var(--cyan)}
+.footer-links a:hover{text-decoration:underline}
+.to-top{position:fixed;right:22px;bottom:22px;width:46px;height:46px;border-radius:14px;border:1px solid var(--line);background:rgba(14,23,48,.85);backdrop-filter:blur(8px);color:var(--cyan);font-size:1.15rem;z-index:40;opacity:0;transform:translateY(14px);pointer-events:none;transition:opacity .3s,transform .3s;box-shadow:var(--shadow)}
+.to-top.show{opacity:1;transform:none;pointer-events:auto}
+.to-top:hover{background:var(--surface-2)}
+
+/* ================= 入场动画 ================= */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .75s cubic-bezier(.2,.6,.3,1),transform .75s cubic-bezier(.2,.6,.3,1)}
+.reveal.visible{opacity:1;transform:none}
+
+/* ================= 响应式 ================= */
+@media (max-width:1024px){
+  .what-grid{grid-template-columns:1fr}
+  .loop-demo{position:static;max-width:520px;margin-inline:auto}
+}
+@media (max-width:900px){
+  .nav-toggle{display:block}
+  .nav-links{position:fixed;top:62px;left:0;right:0;flex-direction:column;align-items:stretch;gap:2px;background:rgba(6,10,19,.97);backdrop-filter:blur(16px);border-bottom:1px solid var(--line);padding:10px 16px 18px;transform:translateY(-130%);transition:transform .35s ease;z-index:55;box-shadow:var(--shadow)}
+  .nav-links.open{transform:none}
+  .nav-links a{padding:13px 14px;font-size:1rem;border-radius:12px}
+  .nav-links a.active::after{display:none}
+  .nav-links a.active{background:rgba(34,211,238,.1)}
+}
+@media (max-width:768px){
+  .timeline::before{left:8px;transform:none}
+  .tl-item,.tl-item:nth-child(even){width:100%;margin-left:0;padding:0 0 30px 34px}
+  .tl-dot,.tl-item:nth-child(even) .tl-dot{left:0;right:auto}
+  .tl-desc{max-height:none}
+  .pc-only{display:block}
+  .hero{padding-top:100px}
+  .step{flex-direction:column;gap:12px}
+  .step:hover{transform:none}
+}
+@media (max-width:480px){
+  .hero-stats{gap:16px}
+  .cap-grid{grid-template-columns:1fr}
+  .term-grid{grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+  .term-card{height:168px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001s !important;animation-iteration-count:1 !important;transition-duration:.001s !important}
+  html{scroll-behavior:auto}
+  .reveal{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">跳到主要内容</a>
+
+<!-- 顶部滚动进度条 -->
+<div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
+
+<!-- ============ 导航栏 ============ -->
+<header class="nav" id="nav">
+  <div class="nav-inner">
+    <a class="brand" href="#home" aria-label="返回首页">
+      <span class="brand-logo" aria-hidden="true">
+        <svg viewBox="0 0 32 32" width="26" height="26"><circle cx="16" cy="16" r="6" fill="none" stroke="currentColor" stroke-width="2.4"/><circle cx="16" cy="5" r="2.4" fill="currentColor"/><circle cx="16" cy="27" r="2.4" fill="currentColor"/><circle cx="5" cy="16" r="2.4" fill="currentColor"/><circle cx="27" cy="16" r="2.4" fill="currentColor"/><circle cx="8.2" cy="8.2" r="2.4" fill="currentColor"/><circle cx="23.8" cy="23.8" r="2.4" fill="currentColor"/><circle cx="23.8" cy="8.2" r="2.4" fill="currentColor"/><circle cx="8.2" cy="23.8" r="2.4" fill="currentColor"/></svg>
+      </span>
+      <span class="brand-text">Agent<span class="brand-accent">进化指南</span></span>
+    </a>
+    <nav class="nav-links" id="navLinks" aria-label="主导航">
+      <a href="#home">首页</a>
+      <a href="#what">什么是 Agent</a>
+      <a href="#capabilities">能做什么</a>
+      <a href="#glossary">词汇表</a>
+      <a href="#history">发展历程</a>
+      <a href="#heavyion">重离子研究</a>
+      <a href="#growth">普通人进阶</a>
+    </nav>
+    <button class="nav-toggle" id="navToggle" aria-label="打开菜单" aria-expanded="false" aria-controls="navLinks">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ============ 01 首页 Hero ============ -->
+<section class="hero" id="home">
+  <canvas class="hero-canvas" id="heroCanvas" aria-hidden="true"></canvas>
+  <div class="hero-glow" aria-hidden="true"></div>
+  <div class="hero-content">
+    <p class="hero-kicker reveal">AI · AGENT · 交互式科普</p>
+    <h1 class="hero-title reveal">让 <span class="grad-text">Agent</span> 为你工作</h1>
+    <p class="hero-sub reveal">从零开始认识 AI 智能体：它是什么、能帮你做什么、核心词汇怎么理解，<br class="pc-only">以及它如何改变科学研究与普通人的生活。</p>
+    <div class="hero-actions reveal">
+      <a class="btn btn-primary" href="#what">开始学习 <span aria-hidden="true">→</span></a>
+      <a class="btn btn-ghost" href="#heavyion">科学家视角</a>
+    </div>
+    <div class="hero-stats reveal" id="heroStats" aria-label="站点数据">
+      <div class="stat"><b class="stat-num" data-count="7">0</b><span>大知识板块</span></div>
+      <div class="stat"><b class="stat-num" data-count="14">0</b><span>核心词汇卡片</span></div>
+      <div class="stat"><b class="stat-num" data-count="12">0</b><span>历史里程碑</span></div>
+      <div class="stat"><b class="stat-num" data-count="5">0</b><span>普通人进阶步骤</span></div>
+    </div>
+  </div>
+  <a class="hero-scroll" href="#what" aria-label="向下滚动">
+    <span class="mouse"><span class="wheel"></span></span>
+  </a>
+</section>
+
+<!-- ============ 02 什么是 Agent ============ -->
+<section class="section" id="what">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="sec-num">01</span>
+      <h2>什么是 <span class="grad-text">Agent</span>？</h2>
+      <p class="sec-desc">一句话：Agent（智能体）是「会用工具的 AI」。它不再只是回答问题的聊天框，而是一个能<strong>自己拆解任务、调用工具、反复试错</strong>的数字助手。</p>
+    </div>
+
+    <div class="what-grid">
+      <div class="what-text reveal">
+        <h3>从「聊天机器人」到「智能体」</h3>
+        <p>传统聊天机器人只能一问一答，所有思考都发生在对话框里。而 <strong>Agent</strong> 拥有一个「循环大脑」：</p>
+        <ul class="check-list">
+          <li><b>感知</b>：理解你的目标，获取信息（读文件、搜网页、查数据库）。</li>
+          <li><b>规划</b>：把大任务拆成小步骤，决定先做什么、用什么工具。</li>
+          <li><b>行动</b>：调用工具执行——写代码、点按钮、发消息、操作软件。</li>
+          <li><b>反思</b>：观察结果，发现错误就修正，直到完成任务。</li>
+        </ul>
+        <p class="what-tip">💡 就像一位「有手有脚有大脑」的数字实习生：你交代目标，它负责把活儿干完，而不是只给你建议。</p>
+      </div>
+
+      <!-- 交互式 Agent 循环演示 -->
+      <div class="loop-demo reveal" id="loopDemo">
+        <div class="loop-stage">
+          <div class="loop-core">Agent<br><small>智能体</small></div>
+          <div class="loop-node" data-step="0" style="--angle:270deg"><span class="node-icon">👁️</span><span class="node-name">感知</span></div>
+          <div class="loop-node" data-step="1" style="--angle:0deg"><span class="node-icon">🧠</span><span class="node-name">规划</span></div>
+          <div class="loop-node" data-step="2" style="--angle:90deg"><span class="node-icon">🛠️</span><span class="node-name">行动</span></div>
+          <div class="loop-node" data-step="3" style="--angle:180deg"><span class="node-icon">🔁</span><span class="node-name">反思</span></div>
+          <div class="loop-ring ring-1"></div>
+          <div class="loop-ring ring-2"></div>
+        </div>
+        <div class="loop-control">
+          <p class="loop-step-label" id="loopLabel">点击「开始演示」，看看 Agent 如何完成一个任务</p>
+          <div class="loop-dots" id="loopDots">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          </div>
+          <div class="loop-btns">
+            <button class="btn btn-small btn-primary" id="loopNext">开始演示 ▶</button>
+            <button class="btn btn-small btn-ghost" id="loopReset">重置</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 03 Agent 能做什么 ============ -->
+<section class="section section-alt" id="capabilities">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="sec-num">02</span>
+      <h2>Agent 能<span class="grad-text">做什么</span>？</h2>
+      <p class="sec-desc">点击任意卡片查看真实场景。从打杂到科研，Agent 正在渗透所有「动手型」工作。</p>
+    </div>
+
+    <div class="cap-grid">
+      <article class="cap-card reveal">
+        <div class="cap-icon">📝</div>
+        <h3>办公自动化</h3>
+        <p>整理 Excel、生成周报、起草邮件、做 PPT，把重复劳动交给它。</p>
+        <button class="cap-more" data-detail="cap1" aria-expanded="false">查看场景 <span>▾</span></button>
+        <div class="cap-detail" id="cap1"><p>示例：告诉 Agent「把这 200 行销售数据按月份汇总成图表，并写一封给经理的摘要邮件」，它会自己调用表格工具、生成图表、起草邮件，你只需确认发送。</p></div>
+      </article>
+
+      <article class="cap-card reveal">
+        <div class="cap-icon">💻</div>
+        <h3>写代码 &amp; 修 Bug</h3>
+        <p>生成代码、阅读陌生项目、定位报错、写测试，成为你的结对程序员。</p>
+        <button class="cap-more" data-detail="cap2" aria-expanded="false">查看场景 <span>▾</span></button>
+        <div class="cap-detail" id="cap2"><p>示例：把整个报错堆栈粘贴给 Agent，它能定位问题文件、给出修复补丁并运行测试验证；也可以让它把一个旧脚本改写成新框架版本。</p></div>
+      </article>
+
+      <article class="cap-card reveal">
+        <div class="cap-icon">📊</div>
+        <h3>数据分析</h3>
+        <p>清洗数据、做统计、画图、写分析结论，一条龙完成数据探索。</p>
+        <button class="cap-more" data-detail="cap3" aria-expanded="false">查看场景 <span>▾</span></button>
+        <div class="cap-detail" id="cap3"><p>示例：上传 CSV 后，Agent 自动检查缺失值、做相关性分析、生成可视化，并输出一份带结论的报告——它甚至能告诉你这个结论在统计上是否站得住脚。</p></div>
+      </article>
+
+      <article class="cap-card reveal">
+        <div class="cap-icon">🔍</div>
+        <h3>信息检索与调研</h3>
+        <p>联网搜索、读网页、总结文献，几小时内完成几天的工作量。</p>
+        <button class="cap-more" data-detail="cap4" aria-expanded="false">查看场景 <span>▾</span></button>
+        <div class="cap-detail" id="cap4"><p>示例：让 Agent 调研「2024 年以来锂电池回收的技术路线」，它会规划检索关键词、访问多个来源、交叉比对并输出带引用的综述文档。</p></div>
+      </article>
+
+      <article class="cap-card reveal">
+        <div class="cap-icon">🌐</div>
+        <h3>内容创作</h3>
+        <p>写文章、做视频脚本、翻译润色、配图排版，一个人就是一支团队。</p>
+        <button class="cap-more" data-detail="cap5" aria-expanded="false">查看场景 <span>▾</span></button>
+        <div class="cap-detail" id="cap5"><p>示例：给出选题和大纲，Agent 可以产出公众号文章初稿、拆成短视频分镜、生成标题备选，再由你注入个人风格后发布。</p></div>
+      </article>
+
+      <article class="cap-card reveal">
+        <div class="cap-icon">🤝</div>
+        <h3>多智能体协作</h3>
+        <p>多个 Agent 分工：一个写方案、一个挑毛病、一个做执行。</p>
+        <button class="cap-more" data-detail="cap6" aria-expanded="false">查看场景 <span>▾</span></button>
+        <div class="cap-detail" id="cap6"><p>示例：产品经理 Agent 写需求 → 工程师 Agent 评审可行性 → 测试 Agent 生成用例 → 汇总 Agent 输出最终文档。它们像一支远程团队，通过共享文件接力完成工作。</p></div>
+      </article>
+
+      <article class="cap-card reveal">
+        <div class="cap-icon">📅</div>
+        <h3>日程与生活管家</h3>
+        <p>订票比价、安排行程、管理待办、定时提醒，打理日常琐事。</p>
+        <button class="cap-more" data-detail="cap7" aria-expanded="false">查看场景 <span>▾</span></button>
+        <div class="cap-detail" id="cap7"><p>示例：告诉 Agent「帮我规划下周三天的北京出差」，它查询航班与酒店、把行程写进日历、生成预算清单，并在出发前提醒你值机。</p></div>
+      </article>
+
+      <article class="cap-card reveal">
+        <div class="cap-icon">🔬</div>
+        <h3>科研辅助</h3>
+        <p>读论文、跑模拟、分析实验数据、辅助论文写作——详见「重离子研究」板块。</p>
+        <button class="cap-more" data-detail="cap8" aria-expanded="false">查看场景 <span>▾</span></button>
+        <div class="cap-detail" id="cap8"><p>示例：物理学家让 Agent 批量总结 arXiv 上某方向的近期论文、把实验数据整理成可绘图格式，或解释一段陌生的 ROOT 分析代码。</p></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 04 基础词汇 ============ -->
+<section class="section" id="glossary">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="sec-num">03</span>
+      <h2>基础<span class="grad-text">词汇</span>速查</h2>
+      <p class="sec-desc">点击卡片翻面查看通俗解释。先记住这 14 个词，就能看懂 90% 的 Agent 讨论。</p>
+    </div>
+
+    <div class="term-grid" id="termGrid">
+      <!-- 词卡由 JS 生成，便于维护 -->
+    </div>
+    <p class="terms-hint reveal">👆 点击卡片翻转 · 手机端同样支持</p>
+  </div>
+</section>
+
+<!-- ============ 05 发展历程 ============ -->
+<section class="section section-alt" id="history">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="sec-num">04</span>
+      <h2>Agent 的<span class="grad-text">过去与未来</span></h2>
+      <p class="sec-desc">从「机器能否思考」的哲学之问，到如今 Agent 走进办公室。点击节点查看细节。</p>
+    </div>
+
+    <div class="timeline" id="timeline"><!-- 节点由 JS 生成 --></div>
+  </div>
+</section>
+
+<!-- ============ 06 重离子碰撞 ============ -->
+<section class="section" id="heavyion">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="sec-num">05</span>
+      <h2>Agent × <span class="grad-text">重离子碰撞</span>研究</h2>
+      <p class="sec-desc">重离子碰撞是研究「宇宙诞生最初几微秒」的极端实验。下面的动画示意两个金原子核碰撞喷出上千个粒子，点击「重放」再看一次。</p>
+    </div>
+
+    <div class="hi-demo reveal">
+      <canvas id="collisionCanvas" aria-label="重离子碰撞动画示意" width="900" height="360"></canvas>
+      <div class="hi-controls">
+        <button class="btn btn-small btn-primary" id="collideBtn">⚡ 重放碰撞</button>
+        <span class="hi-tip" id="collideTip">等待碰撞…</span>
+      </div>
+      <p class="hi-caption">示意图：两束接近光速的金原子核对撞 → 产生夸克胶子等离子体 → 冷却后喷出上千个强子，被 STAR / ALICE 等探测器捕获。</p>
+    </div>
+
+    <div class="what-grid">
+      <div class="what-text reveal">
+        <h3>Agent 如何帮重离子研究者？</h3>
+        <p>实验物理学家的一天充满「琐碎但重要」的环节，而这些环节恰恰是 Agent 最擅长的：</p>
+        <ul class="check-list">
+          <li><b>文献与调研</b>：让 Agent 追踪 arXiv 每日更新，自动总结某可观测量的最新测量。</li>
+          <li><b>代码助手</b>：解释与生成 ROOT / Python 分析代码，把 MACRO 从旧版本迁移到新版本。</li>
+          <li><b>数据流水线</b>：自动清洗 TTree/TTree 列、合并 run、生成 QA 图与报表。</li>
+          <li><b>模拟优化</b>：辅助调参 Pythia / HIJING / GEANT4 模拟，对比数据与模型。</li>
+          <li><b>论文与报告</b>：整理图表、生成初稿、统一参考文献格式，省下大量排版时间。</li>
+          <li><b>跨领域问答</b>：快速解释探测器物理、核物理或统计方法中的陌生概念。</li>
+        </ul>
+      </div>
+      <div class="what-text reveal">
+        <h3>一个真实的场景</h3>
+        <div class="story-card">
+          <p class="story-q">🎓 研究生小明拿到一批新的 Au+Au 数据：</p>
+          <ol class="story-steps">
+            <li><b>① 提问</b>：「帮我看看这批 run 的 vertex 分布是否正常。」</li>
+            <li><b>② 执行</b>：Agent 写一段 ROOT 脚本画出分布，发现某几个 run 有偏移。</li>
+            <li><b>③ 分析</b>：它对比 run log，定位到触发条件的配置变更。</li>
+            <li><b>④ 交付</b>：输出一份排除问题 run 的新列表 + 一张干净的分布图。</li>
+          </ol>
+          <p class="story-a">✅ 小明原本 3 小时的工作，缩短到 30 分钟——关键不是替代物理学家，而是把「体力活」抽走，让人专注在物理问题上。</p>
+        </div>
+        <p class="what-tip">⚠️ 温馨提示：Agent 会「一本正经地胡说八道」。科研场景务必<strong>人工复核代码与结论</strong>，把它当作聪明的助手而非权威。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 07 普通人进阶 ============ -->
+<section class="section section-alt" id="growth">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="sec-num">06</span>
+      <h2>普通人如何靠 <span class="grad-text">AI</span> 实现进步</h2>
+      <p class="sec-desc">不需要会编程。把 AI 当成「随叫随到的私人教练」，按下面 5 步上手，逐步建立自己的 AI 工作流。</p>
+    </div>
+
+    <div class="steps" id="steps">
+      <div class="step reveal" data-step="1">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h3>选一个真实目标</h3>
+          <p>进步始于具体问题：「学会写英文邮件」「完成月度复盘」「学会数据分析」…… 目标越具体，AI 越好帮你。</p>
+        </div>
+      </div>
+      <div class="step reveal" data-step="2">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h3>学会「给 AI 派活」</h3>
+          <p>把任务讲清楚：背景 + 目标 + 要求 + 输出格式。一句话公式：<b>「我是一名____，需要____，因为____，请用____形式输出。」</b></p>
+          <div class="prompt-demo">📋 示例：<i>「我是一名市场助理，需要为下季度的活动写 3 个开场白，受众是年轻用户，请给出 3 个不同风格的选项，每个不超过 50 字。」</i></div>
+        </div>
+      </div>
+      <div class="step reveal" data-step="3">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h3>从「对话」升级到「Agent」</h3>
+          <p>先用 ChatGPT / 文心一言 / DeepSeek / Kimi 等大模型练手；再尝试带工具的 Agent（如各类 AI 助手的工作台、编程助手），让它真正动手完成流程。</p>
+        </div>
+      </div>
+      <div class="step reveal" data-step="4">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h3>建立反馈回路</h3>
+          <p>让 AI 给你打分、挑错、出测试题；把它的输出用在自己的真实场景里，观察哪些有效、哪些需要修正——进步来自循环迭代。</p>
+        </div>
+      </div>
+      <div class="step reveal" data-step="5">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <h3>沉淀你的「工作流」</h3>
+          <p>把反复使用的提示词、模板、流程保存下来，形成个人知识库。几个月后你会发现：AI 不是替代你，而是放大你。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="growth-cta reveal">
+      <h3>🚀 现在就试试</h3>
+      <p>打开任意一个大模型对话，用下面这句话开始你的第一步：</p>
+      <div class="copy-box">
+        <code id="starterPrompt">我是一名【你的身份】，最近的目标是【具体目标】。请帮我把这个目标拆解成未来两周可执行的小步骤，并告诉我每一步需要什么信息、用什么 AI 工具辅助，最后给我一个自检清单。</code>
+        <button class="btn btn-small btn-primary" id="copyBtn">复制</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ============ 页脚 ============ -->
+<footer class="footer">
+  <div class="container">
+    <p class="footer-title">Agent 进化指南 · 交互式科普演示站</p>
+    <p>本站为纯前端离线科普页面，不采集任何数据。内容基于公开资料整理，仅供学习参考；AI 输出请务必人工复核。</p>
+    <p class="footer-links">
+      <a href="#home">回到顶部 ↑</a> ·
+      <a href="#glossary">词汇表</a> ·
+      <a href="#history">发展历程</a> ·
+      <a href="#heavyion">重离子研究</a>
+    </p>
+  </div>
+</footer>
+
+<button class="to-top" id="toTop" aria-label="回到顶部">↑</button>
+
+<!-- ===== JS:APP ===== -->
+<script>
+'use strict';
+(function(){
+  const $  = (s, c) => (c || document).querySelector(s);
+  const $$ = (s, c) => Array.from((c || document).querySelectorAll(s));
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- 1. 导航 / 进度条 / 返回顶部 ---------- */
+  const nav = $('#nav'), navToggle = $('#navToggle'), navLinks = $('#navLinks');
+  const toTop = $('#toTop'), progress = $('#scrollProgress');
+  const navAnchors = $$('.nav-links a');
+
+  function onScroll(){
+    const y = window.scrollY;
+    nav.classList.toggle('scrolled', y > 30);
+    const h = document.documentElement.scrollHeight - window.innerHeight;
+    progress.style.width = (h > 0 ? (y / h) * 100 : 0) + '%';
+    toTop.classList.toggle('show', y > 600);
+  }
+  window.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+
+  navToggle.addEventListener('click', () => {
+    const open = navLinks.classList.toggle('open');
+    navToggle.classList.toggle('open', open);
+    navToggle.setAttribute('aria-expanded', String(open));
+    navToggle.setAttribute('aria-label', open ? '关闭菜单' : '打开菜单');
+  });
+  navAnchors.forEach(a => a.addEventListener('click', () => {
+    navLinks.classList.remove('open');
+    navToggle.classList.remove('open');
+    navToggle.setAttribute('aria-expanded', 'false');
+  }));
+  toTop.addEventListener('click', () => window.scrollTo({top:0, behavior: reduceMotion ? 'auto' : 'smooth'}));
+
+  /* 滚动高亮当前板块 */
+  const sections = $$('main section[id]');
+  const spy = new IntersectionObserver(es => {
+    es.forEach(e => {
+      if (e.isIntersecting){
+        const id = e.target.id;
+        navAnchors.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + id));
+      }
+    });
+  }, {rootMargin:'-42% 0px -52% 0px'});
+  sections.forEach(s => spy.observe(s));
+
+  /* ---------- 2. 入场动画（含交错延迟） ---------- */
+  const reveals = $$('.reveal');
+  const revealIO = new IntersectionObserver(es => {
+    es.forEach(e => {
+      if (!e.isIntersecting) return;
+      const el = e.target;
+      const sibs = Array.from(el.parentElement.children).filter(c => c.classList.contains('reveal'));
+      const idx = sibs.indexOf(el);
+      el.style.transitionDelay = Math.min(idx * 90, 450) + 'ms';
+      el.classList.add('visible');
+      revealIO.unobserve(el);
+    });
+  }, {threshold:.12});
+  reveals.forEach(r => revealIO.observe(r));
+
+  /* ---------- 3. 数字滚动 ---------- */
+  const statIO = new IntersectionObserver(es => {
+    es.forEach(e => {
+      if (!e.isIntersecting) return;
+      const el = e.target;
+      const target = parseInt(el.dataset.count, 10);
+      if (reduceMotion){ el.textContent = target; statIO.unobserve(el); return; }
+      const t0 = performance.now(), dur = 1400;
+      (function tick(t){
+        const p = Math.min((t - t0) / dur, 1);
+        el.textContent = Math.round(target * (1 - Math.pow(1 - p, 3)));
+        if (p < 1) requestAnimationFrame(tick);
+      })(t0);
+      statIO.unobserve(el);
+    });
+  }, {threshold:.4});
+  $$('.stat-num').forEach(n => statIO.observe(n));
+
+  /* ---------- 4. Hero 粒子网络 ---------- */
+  (function heroNet(){
+    const canvas = $('#heroCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let W, H, pts = [];
+    const DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+    function resize(){
+      W = canvas.offsetWidth; H = canvas.offsetHeight;
+      canvas.width = W * DPR; canvas.height = H * DPR;
+      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+      const n = Math.min(90, Math.floor(W * H / 16000));
+      pts = Array.from({length:n}, () => ({
+        x: Math.random()*W, y: Math.random()*H,
+        vx: (Math.random()-.5)*.35, vy: (Math.random()-.5)*.35,
+        r: Math.random()*1.8 + .6,
+        hue: Math.random() < .5 ? 190 : 265
+      }));
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    if (reduceMotion){
+      ctx.clearRect(0,0,W,H);
+      pts.forEach(p => { ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,7); ctx.fillStyle='rgba(147,163,196,.5)'; ctx.fill(); });
+      return;
+    }
+
+    function draw(){
+      ctx.clearRect(0,0,W,H);
+      const link = 130;
+      for (let i=0;i<pts.length;i++){
+        const a = pts[i];
+        a.x += a.vx; a.y += a.vy;
+        if (a.x < -20) a.x = W+20; if (a.x > W+20) a.x = -20;
+        if (a.y < -20) a.y = H+20; if (a.y > H+20) a.y = -20;
+        ctx.beginPath(); ctx.arc(a.x,a.y,a.r,0,7);
+        ctx.fillStyle = `hsla(${a.hue},85%,68%,.75)`;
+        ctx.fill();
+        for (let j=i+1;j<pts.length;j++){
+          const b = pts[j];
+          const dx = a.x-b.x, dy = a.y-b.y, d2 = dx*dx+dy*dy;
+          if (d2 < link*link){
+            const o = (1 - Math.sqrt(d2)/link) * .34;
+            ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y);
+            ctx.strokeStyle = `hsla(210,80%,70%,${o})`;
+            ctx.lineWidth = 1;
+            ctx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(draw);
+    }
+    draw();
+  })();
+
+  /* ---------- 5. Agent 循环演示 ---------- */
+  (function loopDemo(){
+    const demo = $('#loopDemo');
+    if (!demo) return;
+    const nodes = $$('.loop-node', demo);
+    const dots = $$('.dot', demo);
+    const label = $('#loopLabel');
+    const nextBtn = $('#loopNext'), resetBtn = $('#loopReset');
+    const steps = [
+      {t:'感知 Perceive', d:'读取你的任务并收集信息：打开文件、搜索网页、查看数据，弄清楚「现在是什么情况」。'},
+      {t:'规划 Plan', d:'把大目标拆成小步骤，决定先后顺序和要调用的工具，像写一份待办清单。'},
+      {t:'行动 Act', d:'真正动手执行：运行代码、操作软件、发送请求、生成文档——把想法变成结果。'},
+      {t:'反思 Reflect', d:'检查输出是否符合要求，发现报错就修正，效果不好就换思路，循环直到完成。'}
+    ];
+    let cur = -1, playing = false, timer = null;
+
+    function render(i){
+      nodes.forEach((n, k) => {
+        n.classList.toggle('active', k === i);
+        n.classList.toggle('done', k < i);
+      });
+      dots.forEach((d, k) => d.classList.toggle('on', k <= i));
+      if (i === -1){
+        label.innerHTML = '点击「开始演示」，看看 Agent 如何完成一个任务';
+      } else {
+        const s = steps[i];
+        label.innerHTML = `<b>步骤 ${i+1}/4 · ${s.t}</b><br>${s.d}`;
+      }
+    }
+    render(-1);
+
+    function next(){
+      if (cur < 3){
+        cur++;
+        render(cur);
+        if (cur === 3){
+          nextBtn.textContent = '再来一遍 ↻';
+        }
+      } else {
+        cur = 0;
+        render(cur);
+        nextBtn.textContent = '下一步 ▶';
+      }
+    }
+    nextBtn.addEventListener('click', next);
+    resetBtn.addEventListener('click', () => {
+      clearTimeout(timer);
+      cur = -1; playing = false;
+      render(-1);
+      nextBtn.textContent = '开始演示 ▶';
+    });
+    nodes.forEach((n, k) => n.addEventListener('click', () => {
+      cur = k; render(cur);
+      nextBtn.textContent = cur === 3 ? '再来一遍 ↻' : '下一步 ▶';
+    }));
+    // 自动演示一轮（循环）
+    (function auto(){
+      if (reduceMotion) return;
+      timer = setTimeout(() => { next(); auto(); }, 3200);
+    })();
+  })();
+
+  /* ---------- 6. 能力卡片展开 ---------- */
+  $$('.cap-more').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const card = btn.closest('.cap-card');
+      const open = card.classList.toggle('expanded');
+      btn.setAttribute('aria-expanded', String(open));
+    });
+  });
+
+  /* ---------- 7. 词汇卡（翻转） ---------- */
+  (function terms(){
+    const grid = $('#termGrid');
+    if (!grid) return;
+    const data = [
+      {i:'🤖', en:'AI', zh:'人工智能', d:'让机器模拟人类智能的技术总称。Agent 是大模型驱动、能自主执行任务的 AI 应用形态。'},
+      {i:'🧠', en:'LLM', zh:'大语言模型', d:'基于海量文本训练、能理解和生成自然语言的模型，例如 GPT、DeepSeek、Claude。它是 Agent 的「大脑」。'},
+      {i:'📝', en:'Prompt', zh:'提示词', d:'你给 AI 的指令文字。提示词是否清晰，直接决定输出质量——学会提问是入门第一课。'},
+      {i:'🔤', en:'Token', zh:'词元', d:'模型处理文本的最小单位，大致相当于半个中文词或一个英文单词。计费和上下文长度都按 Token 计算。'},
+      {i:'🪟', en:'Context Window', zh:'上下文窗口', d:'模型一次能「记住」的文本量（如 128K Token）。超出窗口的内容会被遗忘，需要靠记忆或摘要解决。'},
+      {i:'📚', en:'RAG', zh:'检索增强生成', d:'先从外部资料库检索相关内容，再让模型基于这些资料作答，能显著减少编造，是「给 AI 装知识库」的关键技术。'},
+      {i:'🔧', en:'Tool Calling', zh:'工具调用', d:'Agent 的核心能力：模型输出「调用哪个工具、传什么参数」的指令，程序去真实执行（搜索、运行代码、操作软件），再把结果交回模型。'},
+      {i:'⚙️', en:'Function Calling', zh:'函数调用', d:'与工具调用类似：模型从预先定义的函数列表中选择并生成参数，程序执行后把结果回传给模型继续推理。'},
+      {i:'💾', en:'Memory', zh:'记忆', d:'Agent 记住过往对话与结果的能力：短期靠上下文窗口，长期靠向量数据库，让 Agent 跨任务保持一致。'},
+      {i:'🕸️', en:'Multi-Agent', zh:'多智能体', d:'多个 Agent 各司其职、互相协作，像一支团队：一个规划、一个执行、一个质检，共同完成复杂任务。'},
+      {i:'🎯', en:'Fine-tuning', zh:'微调', d:'用特定领域的数据进一步训练模型，让它更擅长某个方向（如物理术语、某公司文档风格），像给员工做岗前培训。'},
+      {i:'🌀', en:'Hallucination', zh:'幻觉', d:'模型一本正经地编造不存在的事实或引用。AI 输出务必人工核实，尤其在科研与法律等严肃场景。'},
+      {i:'🎼', en:'Orchestration', zh:'智能体编排', d:'设计多个 Agent 的分工、流程与决策逻辑，像指挥一支团队。框架如 LangGraph、AutoGen 都在做这件事。'},
+      {i:'📏', en:'Benchmark', zh:'评测基准', d:'用来量化模型或 Agent 能力的标准化任务集，如数学、代码、工具使用测试。分数高≠实际好用，只能作参考。'}
+    ];
+    grid.innerHTML = data.map((t, idx) => `
+      <article class="term-card reveal" role="button" tabindex="0" aria-label="词汇：${t.zh}，点击翻转查看解释">
+        <div class="term-inner">
+          <div class="term-face term-front">
+            <span class="t-icon">${t.i}</span>
+            <span class="t-en">${t.en}</span>
+            <h3>${t.zh}</h3>
+            <span class="t-hint">点击翻面 ↻</span>
+          </div>
+          <div class="term-face term-back">
+            <h4>${t.i} ${t.zh} <span style="font-family:var(--mono);font-size:.68rem;color:var(--violet)">${t.en}</span></h4>
+            <p>${t.d}</p>
+          </div>
+        </div>
+      </article>`).join('');
+
+    $$('.term-card', grid).forEach(card => {
+      const flip = () => card.classList.toggle('flipped');
+      card.addEventListener('click', flip);
+      card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); flip(); } });
+    });
+  })();
+
+  /* ---------- 8. 发展历程时间轴 ---------- */
+  (function timeline(){
+    const tl = $('#timeline');
+    if (!tl) return;
+    const data = [
+      {y:'1950', t:'图灵测试：AI 的「出生证明」', b:'起点', f:false, d:'图灵提出「机器能否思考」，并给出判定方法——如果人无法分辨对话者是人还是机器，就称其有智能。这为 AI 定下了目标。'},
+      {y:'1966', t:'ELIZA：初代聊天机器人', b:'萌芽', f:false, d:'麻省理工的 ELIZA 用简单的模式匹配模拟心理医生，虽然「并不理解」，却让无数人愿意和它聊天——对话式 AI 自此诞生。'},
+      {y:'1980s', t:'专家系统：规则时代', b:'知识', f:false, d:'用「如果-那么」规则把专家知识编码进程序，如医疗诊断系统 MYCIN。能解决特定问题，但无法迁移、无法学习。'},
+      {y:'1997', t:'深蓝战胜国际象棋世界冠军', b:'专用', f:false, d:'IBM 深蓝击败卡斯帕罗夫，靠穷举搜索。它很强大，但只会下棋——是「专用智能」，离通用智能还很远。'},
+      {y:'2011', t:'Siri：AI 走进手机', b:'大众', f:false, d:'语音助手开始普及，能查天气、设闹钟。但只能执行预设指令，无法理解复杂意图——本质是「命令解析器」。'},
+      {y:'2016', t:'AlphaGo 击败李世石', b:'突破', f:false, d:'深度强化学习的里程碑，AI 在围棋这一人类智慧高地上获胜，大众第一次感受到深度学习的威力。'},
+      {y:'2018', t:'大模型元年：BERT / GPT-1', b:'转折', f:false, d:'Transformer 架构让语言模型能力飞跃：预训练 + 微调范式确立，为后来的「通用大脑」打下基础。'},
+      {y:'2022', t:'ChatGPT：对话革命', b:'破圈', f:false, d:'ChatGPT 发布，5 天注册百万用户。大模型第一次以对话形态进入亿万普通人生活，AI 元年到来。'},
+      {y:'2023', t:'Agent 元年：AutoGPT 等', b:'进化', f:false, d:'模型开始调用工具、自主拆解任务、循环试错——从「聊天」走向「干活」。AutoGPT、BabyAGI 等引爆 Agent 概念。'},
+      {y:'2024–25', t:'Agent 工程化落地', b:'当前', f:false, d:'RAG、工具调用、多智能体框架（LangGraph、AutoGen）走向成熟；Agent 开始在企业里处理邮件、数据、代码等真实工作流。'},
+      {y:'2026+', t:'自主多智能体时代（展望）', b:'未来', f:true, d:'多个 Agent 跨系统、跨平台协作，处理持续数周的长周期任务：自动调研、自动实验、自动写报告，人只负责设定目标与审核。'},
+      {y:'2030+', t:'AGI 之问（展望）', b:'未来', f:true, d:'若通用人工智能实现，Agent 将拥有跨领域学习与自我改进能力。届时人机协作的形态、工作的定义，都将被彻底重写。'}
+    ];
+    tl.innerHTML = data.map((m, idx) => `
+      <div class="tl-item ${m.f ? 'future' : ''}" data-i="${idx}">
+        <div class="tl-dot" aria-hidden="true"></div>
+        <div class="tl-card" role="button" tabindex="0" aria-expanded="false">
+          <div class="tl-date">${m.y}</div>
+          <div class="tl-title">${m.t}<span class="tl-badge ${m.f ? 'future' : ''}">${m.b}</span></div>
+          <div class="tl-desc"><p>${m.d}</p></div>
+        </div>
+      </div>`).join('');
+
+    $$('.tl-item', tl).forEach(item => {
+      const card = $('.tl-card', item);
+      const toggle = () => {
+        const open = item.classList.toggle('open');
+        card.setAttribute('aria-expanded', String(open));
+      };
+      card.addEventListener('click', toggle);
+      card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
+    });
+  })();
+
+  /* ---------- 9. 重离子碰撞 Canvas ---------- */
+  (function collision(){
+    const canvas = $('#collisionCanvas');
+    const btn = $('#collideBtn');
+    const tip = $('#collideTip');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    const CY = H * .55;
+    const DPR = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = W * DPR; canvas.height = H * DPR;
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+
+    const NUC_R = 30;
+    const state = { phase:'approach', t:0, flash:0, ring:0, parts:[], ck:0 };
+    const R = () => (Math.random()-.5) * 2;
+
+    function spawnBurst(){
+      state.parts = [];
+      const n = 220;
+      for (let i=0;i<n;i++){
+        const ang = Math.random() * Math.PI * 2;
+        const sp = 1.5 + Math.random() * 5.5;
+        state.parts.push({
+          x: W/2 + R()*8, y: CY + R()*8,
+          vx: Math.cos(ang)*sp, vy: Math.sin(ang)*sp * .82,
+          life: 1, decay: .006 + Math.random()*.012,
+          r: 1 + Math.random()*2.6,
+          hue: Math.random() < .45 ? 190 : (Math.random() < .5 ? 265 : 320)
+        });
+      }
+      state.flash = 1; state.ring = 0;
+    }
+
+    function drawNucleus(x, glow){
+      ctx.save();
+      ctx.shadowColor = glow ? '#f5d742' : '#f0c32c';
+      ctx.shadowBlur = 26;
+      const g = ctx.createRadialGradient(x-8, CY-10, 2, x, CY, NUC_R);
+      g.addColorStop(0, '#fff3b0'); g.addColorStop(.55, '#f5c542'); g.addColorStop(1, '#c98a12');
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(x, CY, NUC_R, 0, 7); ctx.fill();
+      // 表面条纹（金核质感）
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = 'rgba(120,60,0,.5)';
+      ctx.lineWidth = 1.4;
+      for (let i=0;i<5;i++){
+        ctx.beginPath(); ctx.ellipse(x, CY, NUC_R*.9, NUC_R*(.18+.05*i), i*.55, 0, 7); ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    let raf = null, running = false;
+    function loop(){
+      const dt = 1;
+      if (state.phase === 'approach'){
+        state.t += 1.6;
+        if (state.t > 130){ state.phase = 'collide'; spawnBurst(); tip.textContent = '⚛️ 碰撞！夸克胶子等离子体形成'; }
+      } else if (state.phase === 'collide'){
+        state.flash = Math.max(0, state.flash - .02);
+        state.ring += 3.5;
+        state.t += 1;
+        state.parts.forEach(p => {
+          p.x += p.vx; p.y += p.vy;
+          p.vx *= .988; p.vy *= .988;
+          p.life -= p.decay;
+        });
+        state.parts = state.parts.filter(p => p.life > 0);
+        if (state.parts.length === 0 && state.flash <= 0){
+          state.phase = 'idle';
+          tip.textContent = '✅ 完成：上千个粒子被探测器记录（示意）';
+          setTimeout(() => { state.phase = 'approach'; state.t = 0; tip.textContent = '⚡ 点击「重放碰撞」再看一次'; }, 1400);
+        }
+      }
+
+      // 绘制
+      ctx.clearRect(0, 0, W, H);
+      // 背景网格
+      ctx.strokeStyle = 'rgba(90,130,220,.07)';
+      ctx.lineWidth = 1;
+      for (let gx = 0; gx < W; gx += 44){
+        ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, H); ctx.stroke();
+      }
+      for (let gy = 0; gy < H; gy += 44){
+        ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(W, gy); ctx.stroke();
+      }
+
+      if (state.phase === 'approach' || state.phase === 'idle'){
+        const k = Math.min(state.t / 130, 1);
+        drawNucleus(30 + (W/2 - 60 - 30) * k, true);
+        drawNucleus(W - 30 - (W/2 - 60 - 30) * k, true);
+      } else {
+        drawNucleus(W/2 - 60, true);
+        drawNucleus(W/2 + 60, true);
+        // 冲击波
+        if (state.ring > 0){
+          ctx.strokeStyle = `rgba(160,220,255,${Math.max(0, .5 - state.ring/180)})`;
+          ctx.lineWidth = 3;
+          ctx.beginPath(); ctx.arc(W/2, CY, state.ring, 0, 7); ctx.stroke();
+        }
+        // 闪光
+        if (state.flash > 0){
+          const g = ctx.createRadialGradient(W/2, CY, 2, W/2, CY, 90);
+          g.addColorStop(0, `rgba(255,255,255,${state.flash*.9})`);
+          g.addColorStop(.4, `rgba(170,220,255,${state.flash*.45})`);
+          g.addColorStop(1, 'rgba(170,220,255,0)');
+          ctx.fillStyle = g;
+          ctx.beginPath(); ctx.arc(W/2, CY, 90, 0, 7); ctx.fill();
+        }
+        // 粒子
+        state.parts.forEach(p => {
+          ctx.globalAlpha = Math.max(0, Math.min(1, p.life * 2));
+          ctx.fillStyle = `hsl(${p.hue},85%,68%)`;
+          ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 7); ctx.fill();
+        });
+        ctx.globalAlpha = 1;
+      }
+      raf = requestAnimationFrame(loop);
+    }
+
+    btn.addEventListener('click', () => {
+      if (reduceMotion){
+        state.phase = 'collide'; state.t = 0;
+        spawnBurst();
+        tip.textContent = '⚛️ 碰撞！';
+        setTimeout(() => { state.phase = 'idle'; tip.textContent = '✅ 完成（动画已因系统设置简化）'; }, 1200);
+        return;
+      }
+      state.phase = 'collide'; state.t = 0; spawnBurst();
+      tip.textContent = '⚛️ 碰撞！夸克胶子等离子体形成';
+    });
+
+    if (reduceMotion){
+      // 静态示意
+      drawNucleus(90, true); drawNucleus(W-90, true);
+      ctx.fillStyle = 'rgba(160,220,255,.8)';
+      ctx.font = '13px sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText('Au 束流 →', 60, CY + NUC_R + 20);
+      ctx.fillText('← Au 束流', W-70, CY + NUC_R + 20);
+      tip.textContent = '💡 系统已开启「减少动态效果」，显示静态示意图';
+      btn.disabled = false;
+      return;
+    }
+    loop();
+  })();
+
+  /* ---------- 10. 复制提示词 ---------- */
+  (function copy(){
+    const btn = $('#copyBtn');
+    if (!btn) return;
+    const code = $('#starterPrompt');
+    btn.addEventListener('click', async () => {
+      const text = code.textContent.trim();
+      let ok = false;
+      try { await navigator.clipboard.writeText(text); ok = true; }
+      catch(e){
+        const ta = document.createElement('textarea');
+        ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); ok = true; } catch(_){}
+        ta.remove();
+      }
+      if (ok){
+        btn.textContent = '已复制 ✓';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = '复制'; btn.classList.remove('copied'); }, 2000);
+      }
+    });
+  })();
+})();
+</script>
+</body>
+</html>
