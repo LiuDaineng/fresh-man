@@ -661,7 +661,6 @@ button{font-family:inherit;cursor:pointer}
   sections.forEach(s => spy.observe(s));
 
   /* ---------- 2. 入场动画（含交错延迟） ---------- */
-  const reveals = $$('.reveal');
   const revealIO = new IntersectionObserver(es => {
     es.forEach(e => {
       if (!e.isIntersecting) return;
@@ -673,7 +672,13 @@ button{font-family:inherit;cursor:pointer}
       revealIO.unobserve(el);
     });
   }, {threshold:.12});
-  reveals.forEach(r => revealIO.observe(r));
+  // 观察（含 JS 动态注入的）入场元素
+  function observeReveals(root){
+    Array.from((root || document).querySelectorAll('.reveal')).forEach(r => {
+      if (!r.classList.contains('visible')) revealIO.observe(r);
+    });
+  }
+  observeReveals(document);
 
   /* ---------- 3. 数字滚动 ---------- */
   const statIO = new IntersectionObserver(es => {
@@ -856,6 +861,8 @@ button{font-family:inherit;cursor:pointer}
           </div>
         </div>
       </article>`).join('');
+
+    observeReveals(grid);
 
     $$('.term-card', grid).forEach(card => {
       const flip = () => card.classList.toggle('flipped');
